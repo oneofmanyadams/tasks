@@ -6,6 +6,7 @@ import (
     "io"
     "log"
     "os"
+    "sort"
     "strconv"
     "text/tabwriter"
 )
@@ -13,7 +14,40 @@ import (
 // TaskMaster handles adding and removing tasks to a master "list".
 type TaskMaster struct {
     Tasks []Task
+    sortationMode string
 }
+
+// Sortation functions.
+func (s *TaskMaster) Len() int {
+    return len(s.Tasks)
+}
+func (s *TaskMaster) Less(i int, j int) bool {
+    if s.sortationMode == "priority" {
+        return s.Tasks[i].Priority < s.Tasks[j].Priority
+    }
+    return false
+}
+func (s *TaskMaster) Swap(i int, j int) {
+    holder_1 := s.Tasks[i]
+    s.Tasks[i] = s.Tasks[j]
+    s.Tasks[j] = holder_1
+}
+
+// SortByPriority reorginizes TaskMaster.Tasks based on each task's priority.
+// By default this sorts tasks largest to smallest.
+func (s *TaskMaster) SortByPriority() {
+    s.sortationMode = "priority"
+    sort.Sort(s)
+}
+func (s *TaskMaster) SortByDue() {
+    s.sortationMode = "due"
+    sort.Sort(s)
+}
+func (s *TaskMaster) SortByBlended() {
+    s.sortationMode = "blended"
+    sort.Sort(s)
+}
+
 
 // NewTaskMaster creates a new TaskMaster object.
 func NewTaskMaster() (tm TaskMaster) {
@@ -86,9 +120,3 @@ func (s *TaskMaster) LoadFromJson(p string) {
         return
     }
 }
-
-// Sort
-// func (s *TaskMaster) Sort(fields []string, asc bool) {
-//     n
-//
-// }
